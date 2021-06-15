@@ -2,38 +2,104 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
+const db = require('./db');
 const PORT = process.env.PORT || 8000;
 
 app.use(morgan("dev"));
 app.use(express.json());
+
 //get all restaurants
-app.get('/api/v1/restaurants', (req, res) => {
-    res.status(200).json({
+app.get('/api/v1/restaurants', async (req, res) => {
+    try {
+        const result = await db.query("select * from restaurants");
+        res.status(200).json({
             status: "success",
-        data: {
-            restaurant: ["mcD", "wendys", "pizzahut", "kfc"],
-        }
-        })
+            results: result.rows.length,
+            data: {
+                restaurants: result.rows,
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "failed",
+            err: err
+        });
+    }
 });
 
 // get a particular restaurant
-app.get('/api/v1/restaurants/:id', (req, res) => {
+app.get('/api/v1/restaurants/:id', async (req, res) => {
     const { id } = req.params;
+    try {
+        // don't use string interpolation => makes vulnerable to sql injection!
+        const result = await db.query("select * from restaurants where id = $1", [id]);
+        res.status(200).json({
+            status: "success",
+            data: {
+                restaurant: result.rows[0],
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "failed",
+            err: err
+        });
+    }
 });
 
 //create a restaurant
-app.post('/api/v1/restaurants', (req, res) => {
-    console.log(`req.body`, req.body)
+app.post('/api/v1/restaurants', async (req, res) => {
+    const { name, location, price_range } = req.body;
+    try {
+        const result = await db.query("insert into restaurants (name,location,price_range) values ($1,$2,$3) returning *", [name, location, price_range]);
+        res.status(201).json({
+            status: "success",
+            data: {
+                restaurant: result.rows[0],
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "failed",
+            err: err
+        });
+    }
 });
 
 //update a restaurant
-app.put('/api/v1/restaurants/:id', (req, res) => {
+app.put('/api/v1/restaurants/:id', async (req, res) => {
     const { id } = req.params;
+    const { name, location, price_range } = req.body;
+    try {
+        const result = await db.query("update restaurants set name = $1, location = $2, price_range = $3 where id = $4 returning *", [name, location, price_range, id]);
+        res.status(200).json({
+            status: "success",
+            data: {
+                restaurant: result.rows[0],
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "failed",
+            err: err
+        });
+    }
 });
 
 //delete a restaurant
-app.delete('/api/v1/restaurants/:id', (req, res) => {
+app.delete('/api/v1/restaurants/:id', async (req, res) => {
     const { id } = req.params;
+    try {
+        const result = await db.query("delete from restaurants where id = $1", [id]);
+        res.status(204).json({
+            status: "success",
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "failed",
+            err: err
+        });
+    }
 });
 
 //fire up an express server
