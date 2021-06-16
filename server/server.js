@@ -13,7 +13,8 @@ app.use(cors());
 //get all restaurants
 app.get('/api/v1/restaurants', async (req, res) => {
     try {
-        const result = await db.query("select * from restaurants");
+        //const result = await db.query("select * from restaurants");
+        const result = await db.query("select * from restaurants left join(select restaurant_id, count(*), trunc(avg(rating), 1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id = reviews.restaurant_id;");
         res.status(200).json({
             status: "success",
             results: result.rows.length,
@@ -34,7 +35,7 @@ app.get('/api/v1/restaurants/:id', async (req, res) => {
     const { id } = req.params;
     try {
         // don't use string interpolation => makes vulnerable to sql injection!
-        const result = await db.query("select * from restaurants where id = $1", [id]);
+        const result = await db.query("select * from restaurants left join(select restaurant_id, count(*), trunc(avg(rating), 1) as average_rating from reviews group by restaurant_id) reviews on restaurants.id = reviews.restaurant_id where id = $1", [id]);
         const reviews = await db.query("select * from reviews where restaurant_id = $1", [id]);
         res.status(200).json({
             status: "success",

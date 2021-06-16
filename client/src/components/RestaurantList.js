@@ -3,6 +3,7 @@ import axios from '../api/axios';
 import { useHistory } from 'react-router-dom';
 import { RestaurantContext } from '../context/restaurant-context';
 import { Link } from 'react-router-dom';
+import StarRating from './StarRating';
 
 function RestaurantList(props) {
     const history = useHistory();
@@ -27,6 +28,15 @@ function RestaurantList(props) {
             console.log(`err`, err)
         }
     }
+
+    const renderRating = (restaurant) => {
+        return ( <>
+            <StarRating rating={restaurant.average_rating} />
+            {restaurant.count && <span className="text-warning ml-1">({restaurant.count})</span>}
+            </>
+        )
+    }
+
     return (
         <div className="list-group">
             <table className="table table-hover table-dark">
@@ -46,7 +56,7 @@ function RestaurantList(props) {
                             <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>{restaurant.name}</td>
                             <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>{restaurant.location}</td>
                             <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>{"$".repeat(restaurant.price_range)}</td>
-                            <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>ratings</td>
+                            <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>{renderRating(restaurant)}</td>
                             <td><Link to={`/restaurants/${restaurant.id}/update`} className="btn btn-warning">Update</Link></td>
                             <td><button onClick={() => { handleDelete(restaurant.id) }} className="btn btn-danger">Delete</button></td>
                         </tr>

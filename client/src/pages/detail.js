@@ -26,7 +26,12 @@ function Detail() {
     return (
         <div>
             <h1 className="text-center display-1">{selectedRestaurant && selectedRestaurant.restaurant.name}</h1>
-            <StarRating rating={4.5} />
+            <div className="text-center">
+                {selectedRestaurant && <>
+                    <StarRating rating={selectedRestaurant.restaurant.average_rating} />
+                    {selectedRestaurant.restaurant.count && <span className="ml-1">({selectedRestaurant.restaurant.count})</span>}
+                </>}
+            </div>
             {selectedRestaurant && (<div className="mt-3">
                 <Reviews reviews={selectedRestaurant.reviews} />
             </div>)}

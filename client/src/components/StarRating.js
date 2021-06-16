@@ -13,9 +13,9 @@ function StarRating({rating}) {
     }
 
     return (
-        <div className="text-center">
+        <>
             {stars}
-        </div>
+        </>
     )
 }
 
