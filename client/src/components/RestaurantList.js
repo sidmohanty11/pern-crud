@@ -1,6 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import axios from '../api/axios';
 import { RestaurantContext } from '../context/restaurant-context';
+import { Link } from 'react-router-dom';
 
 function RestaurantList(props) {
     const { restaurants, setRestaurants } = useContext(RestaurantContext);
@@ -16,6 +17,14 @@ function RestaurantList(props) {
         }
     }, [setRestaurants]);
 
+    const handleDelete = async (id) => {
+        try {
+            const res = await axios.delete(`/${id}`);
+            setRestaurants(restaurants.filter((restaurant) => restaurant.id !== id));
+        } catch (err) {
+            console.log(`err`, err)
+        }
+    }
     return (
         <div className="list-group">
             <table className="table table-hover table-dark">
@@ -36,8 +45,8 @@ function RestaurantList(props) {
                             <td>{restaurant.location}</td>
                             <td>{"$".repeat(restaurant.price_range)}</td>
                             <td>ratings</td>
-                            <td><button className="btn btn-warning">Update</button></td>
-                            <td><button className="btn btn-danger">Delete</button></td>
+                            <td><Link to={`/restaurants/${restaurant.id}/update`} className="btn btn-warning">Update</Link></td>
+                            <td><button onClick={() => { handleDelete(restaurant.id) }} className="btn btn-danger">Delete</button></td>
                         </tr>
                     ))}
                 </tbody>
