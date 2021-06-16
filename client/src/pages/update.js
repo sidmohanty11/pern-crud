@@ -17,7 +17,7 @@ function Update() {
             setPriceRange(res.data.data.restaurant.price_range);
         }
         fetchRestaurant();
-    }, []);
+    }, [id]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

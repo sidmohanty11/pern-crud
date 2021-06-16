@@ -1,9 +1,11 @@
 import React, { useEffect, useContext } from 'react';
 import axios from '../api/axios';
+import { useHistory } from 'react-router-dom';
 import { RestaurantContext } from '../context/restaurant-context';
 import { Link } from 'react-router-dom';
 
 function RestaurantList(props) {
+    const history = useHistory();
     const { restaurants, setRestaurants } = useContext(RestaurantContext);
     useEffect(() => {
         async function fetchRestaurants() {
@@ -41,10 +43,10 @@ function RestaurantList(props) {
                 <tbody>
                     {restaurants && restaurants.map(restaurant => (
                         <tr key={restaurant.id}>
-                            <td>{restaurant.name}</td>
-                            <td>{restaurant.location}</td>
-                            <td>{"$".repeat(restaurant.price_range)}</td>
-                            <td>ratings</td>
+                            <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>{restaurant.name}</td>
+                            <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>{restaurant.location}</td>
+                            <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>{"$".repeat(restaurant.price_range)}</td>
+                            <td onClick={() => { history.push(`/restaurants/${restaurant.id}`) }}>ratings</td>
                             <td><Link to={`/restaurants/${restaurant.id}/update`} className="btn btn-warning">Update</Link></td>
                             <td><button onClick={() => { handleDelete(restaurant.id) }} className="btn btn-danger">Delete</button></td>
                         </tr>
