@@ -1,12 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 const app = express();
 const db = require('./db');
 const PORT = process.env.PORT || 8000;
 
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cors());
 
 //get all restaurants
 app.get('/api/v1/restaurants', async (req, res) => {
