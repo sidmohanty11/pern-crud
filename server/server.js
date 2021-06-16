@@ -35,10 +35,12 @@ app.get('/api/v1/restaurants/:id', async (req, res) => {
     try {
         // don't use string interpolation => makes vulnerable to sql injection!
         const result = await db.query("select * from restaurants where id = $1", [id]);
+        const reviews = await db.query("select * from reviews where restaurant_id = $1", [id]);
         res.status(200).json({
             status: "success",
             data: {
                 restaurant: result.rows[0],
+                reviews: reviews.rows
             }
         });
     } catch (err) {
@@ -103,6 +105,23 @@ app.delete('/api/v1/restaurants/:id', async (req, res) => {
         });
     }
 });
+
+//add review
+app.post("/api/v1/restaurants/:id/addReview", async (req, res) => {
+    const { id } = req.params;
+    const { name, review, rating } = req.body;
+    try {
+        const newReview = await db.query("insert into reviews (restaurant_id, name, review, rating) values ($1,$2,$3,$4) returning *", [id, name, review, rating]);
+        res.status(201).json({
+            status: "success",
+            data: {
+                review: newReview.rows[0]
+            }
+        });
+    } catch (err) {
+        console.log(`err`, err)
+    }
+})
 
 //fire up an express server
 app.listen(PORT, () => {
